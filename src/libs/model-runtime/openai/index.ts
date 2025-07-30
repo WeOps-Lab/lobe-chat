@@ -24,7 +24,7 @@ export const LobeOpenAI = createOpenAICompatibleRuntime<{
 
       const baseParams = {
         ...rest,
-        model: 'WeOps小助手',
+        model,
         ...(process.env.BK_LITE_APP_ID && { studio_id: process.env.BK_LITE_APP_ID }),
       };
 
