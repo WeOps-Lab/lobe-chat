@@ -553,6 +553,14 @@ export const fetchSSE = async (url: string, options: RequestInit & FetchSSEOptio
       response = res.clone();
       // 如果不 ok 说明有请求错误
       if (!response.ok) {
+        // Check if the status code is 401 and the request path contains webapi/chat/openai
+        if (response.status === 401 && url.includes('webapi/chat/openai')) {
+          throw {
+            body: { status: 401 },
+            message: 'BkLite authentication required',
+            type: ChatErrorType.BkliteAuthRequired,
+          };
+        }
         throw await getMessageError(res);
       }
     },

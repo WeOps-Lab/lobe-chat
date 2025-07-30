@@ -2,6 +2,7 @@ import Auth0 from './auth0';
 import Authelia from './authelia';
 import Authentik from './authentik';
 import AzureAD from './azure-ad';
+import Bklite from './bklite';
 import Casdoor from './casdoor';
 import CloudflareZeroTrust from './cloudflare-zero-trust';
 import GenericOIDC from './generic-oidc';
@@ -29,5 +30,6 @@ export const ssoProviders = [
   WeChat,
   Keycloak,
   Google,
-  Cognito
+  Cognito,
+  Bklite
 ];

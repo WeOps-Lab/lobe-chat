@@ -40,6 +40,8 @@ declare global {
       ZITADEL_CLIENT_ID?: string;
       ZITADEL_CLIENT_SECRET?: string;
       ZITADEL_ISSUER?: string;
+
+      AUTH_BKLITE_API_URL?: string;
     }
   }
 }
@@ -207,6 +209,8 @@ export const getAuthConfig = () => {
 
       // Casdoor
       CASDOOR_WEBHOOK_SECRET: z.string().optional(),
+
+      AUTH_BKLITE_API_URL: z.string().optional(),
     },
 
     runtimeEnv: {
@@ -269,6 +273,9 @@ export const getAuthConfig = () => {
 
       // Casdoor
       CASDOOR_WEBHOOK_SECRET: process.env.CASDOOR_WEBHOOK_SECRET,
+
+      // BKLITE
+      AUTH_BKLITE_API_URL: process.env.AUTH_BKLITE_API_URL,
     },
   });
 };

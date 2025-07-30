@@ -6,6 +6,7 @@ export const ChatErrorType = {
 
   InvalidAccessCode: 'InvalidAccessCode', // is in valid password
   InvalidClerkUser: 'InvalidClerkUser', // is not Clerk User
+  BkliteAuthRequired: 'BkliteAuthRequired', // BkLite authentication required
   FreePlanLimit: 'FreePlanLimit', // is not Clerk User
   SubscriptionPlanLimit: 'SubscriptionPlanLimit', // 订阅用户超限
   SubscriptionKeyMismatch: 'SubscriptionKeyMismatch', // 订阅 key 不匹配

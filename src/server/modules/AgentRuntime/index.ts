@@ -28,7 +28,13 @@ const getParamsFromPayload = (provider: string, payload: JWTPayload) => {
       const apiKey = apiKeyManager.pick(payload?.apiKey || llmConfig[`${upperProvider}_API_KEY`]);
       const baseURL = payload?.baseURL || process.env[`${upperProvider}_PROXY_URL`];
 
-      return baseURL ? { apiKey, baseURL } : { apiKey };
+      // Add bkliteToken support for OpenAI provider
+      const result: any = baseURL ? { apiKey, baseURL } : { apiKey };
+      if (provider === ModelProvider.OpenAI && payload?.bkliteToken) {
+        result.bkliteToken = payload.bkliteToken;
+      }
+      
+      return result;
     }
 
     case ModelProvider.Ollama: {

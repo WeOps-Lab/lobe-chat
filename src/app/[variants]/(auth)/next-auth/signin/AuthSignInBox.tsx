@@ -7,10 +7,11 @@ import { createStyles } from 'antd-style';
 import { AuthError } from 'next-auth';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import BrandWatermark from '@/components/BrandWatermark';
+import BkliteLoginForm from '@/components/BkliteLoginForm';
 import AuthIcons from '@/components/NextAuth/AuthIcons';
 import { DOCUMENTS_REFER_URL, PRIVACY_URL, TERMS_URL } from '@/const/url';
 import { useUserStore } from '@/store/user';
@@ -70,6 +71,7 @@ export default memo(() => {
   const { styles } = useStyles();
   const { t } = useTranslation('clerk');
   const router = useRouter();
+  const [showBkliteForm, setShowBkliteForm] = useState(false);
 
   const oAuthSSOProviders = useUserStore((s) => s.oAuthSSOProviders);
 
@@ -79,6 +81,11 @@ export default memo(() => {
   const callbackUrl = searchParams.get('callbackUrl') ?? '/';
 
   const handleSignIn = async (provider: string) => {
+    if (provider === 'bklite') {
+      setShowBkliteForm(true);
+      return;
+    }
+
     try {
       await signIn(provider, { redirectTo: callbackUrl });
     } catch (error) {
@@ -101,6 +108,55 @@ export default memo(() => {
     { href: PRIVACY_URL, id: 1, label: t('footerPageLink__privacy') },
     { href: TERMS_URL, id: 2, label: t('footerPageLink__terms') },
   ];
+
+  if (showBkliteForm) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.contentCard}>
+          <Flex gap="large" vertical>
+            {/* Header */}
+            <div className={styles.text}>
+              <Text as={'h4'} className={styles.title}>
+                <div>
+                  <LobeChat size={48} />
+                </div>
+                {t('auth:bklite.title', { defaultValue: 'Default Title' })}
+              </Text>
+              <Text as={'p'} className={styles.description}>
+                {t('auth:bklite.description', { defaultValue: 'Default Description' })}
+              </Text>
+            </div>
+            {/* BkLite Login Form */}
+            <Flex justify="center">
+              <BkliteLoginForm 
+                callbackUrl={callbackUrl}
+                onCancel={() => setShowBkliteForm(false)}
+              />
+            </Flex>
+          </Flex>
+        </div>
+        <div className={styles.footer}>
+          {/* Footer */}
+          <Row>
+            <Col span={12}>
+              <Flex justify="left" style={{ height: '100%' }}>
+                <BrandWatermark />
+              </Flex>
+            </Col>
+            <Col offset={4} span={8}>
+              <Flex justify="right">
+                {footerBtns.map((btn) => (
+                  <Button key={btn.id} onClick={() => router.push(btn.href)} size="small" type="text">
+                    {btn.label}
+                  </Button>
+                ))}
+              </Flex>
+            </Col>
+          </Row>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>

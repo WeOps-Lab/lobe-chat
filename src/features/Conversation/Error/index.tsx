@@ -10,6 +10,7 @@ import { AgentRuntimeErrorType, ILobeAgentRuntimeErrorType } from '@/libs/model-
 import { ChatErrorType, ErrorType } from '@/types/fetch';
 import { ChatMessage, ChatMessageError } from '@/types/message';
 
+import BkliteLoginForm from '@/components/BkliteLoginForm';
 import ChatInvalidAPIKey from './ChatInvalidApiKey';
 import ClerkLogin from './ClerkLogin';
 import ErrorJsonViewer from './ErrorJsonViewer';
@@ -105,6 +106,10 @@ const ErrorMessageExtra = memo<{ data: ChatMessage }>(({ data }) => {
 
     case ChatErrorType.InvalidClerkUser: {
       return <ClerkLogin id={data.id} />;
+    }
+
+    case ChatErrorType.BkliteAuthRequired: {
+      return <BkliteLoginForm onCancel={() => {}} />;
     }
 
     case ChatErrorType.InvalidAccessCode: {

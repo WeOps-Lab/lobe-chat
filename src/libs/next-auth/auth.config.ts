@@ -25,6 +25,14 @@ export default {
       if (user?.id) {
         token.userId = user?.id;
       }
+      // If the user has a token attribute (from bklite), store it in the JWT token
+      if (user?.token) {
+        token.accessToken = user.token;
+      }
+      // If the user has a username attribute, also store it in the JWT token
+      if (user?.username) {
+        token.username = user.username;
+      }
       return token;
     },
     async session({ session, token, user }) {
@@ -34,6 +42,14 @@ export default {
           session.user.id = user.id;
         } else {
           session.user.id = (token.userId ?? session.user.id) as string;
+        }
+        // Add the token to the session
+        if (token.accessToken) {
+          session.accessToken = token.accessToken as string;
+        }
+        // Add the username to the session
+        if (token.username) {
+          session.user.username = token.username as string;
         }
       }
       return session;

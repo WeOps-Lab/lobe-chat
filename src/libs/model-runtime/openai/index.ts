@@ -1,3 +1,5 @@
+import OpenAI from 'openai';
+
 import { responsesAPIModels } from '@/const/models';
 
 import { ChatStreamPayload, ModelProvider } from '../types';
@@ -12,25 +14,32 @@ export interface OpenAIModelCard {
 const prunePrefixes = ['o1', 'o3', 'o4', 'codex', 'computer-use'];
 const oaiSearchContextSize = process.env.OPENAI_SEARCH_CONTEXT_SIZE; // low, medium, high
 
-export const LobeOpenAI = createOpenAICompatibleRuntime({
+export const LobeOpenAI = createOpenAICompatibleRuntime<{
+  bkliteToken?: string;
+}>({
   baseURL: 'https://api.openai.com/v1',
   chatCompletion: {
     handlePayload: (payload) => {
       const { enabledSearch, model, ...rest } = payload;
 
+      const baseParams = {
+        ...rest,
+        model: 'WeOps小助手',
+        ...(process.env.BK_LITE_APP_ID && { studio_id: process.env.BK_LITE_APP_ID }),
+      };
+
       if (responsesAPIModels.has(model) || enabledSearch) {
-        return { ...rest, apiMode: 'responses', enabledSearch, model } as ChatStreamPayload;
+        return { ...baseParams, apiMode: 'responses', enabledSearch } as ChatStreamPayload;
       }
 
       if (prunePrefixes.some((prefix) => model.startsWith(prefix))) {
-        return pruneReasoningPayload(payload) as any;
+        return pruneReasoningPayload({ ...baseParams, ...payload }) as any;
       }
 
       if (model.includes('-search-')) {
         return {
-          ...rest,
+          ...baseParams,
           frequency_penalty: undefined,
-          model,
           presence_penalty: undefined,
           stream: payload.stream ?? true,
           temperature: undefined,
@@ -43,7 +52,26 @@ export const LobeOpenAI = createOpenAICompatibleRuntime({
         } as any;
       }
 
-      return { ...rest, model, stream: payload.stream ?? true };
+      return { ...baseParams, stream: payload.stream ?? true };
+    },
+  },
+  // remove the logic for obtaining the token from environment variables
+  constructorOptions: {
+    defaultHeaders: {},
+  },
+  customClient: {
+    createClient: (options) => {
+      const defaultHeaders = options.bkliteToken 
+        ? { 'Authorization': `Bearer ${options.bkliteToken}` }
+        : {};
+
+      return new OpenAI({
+        ...options,
+        defaultHeaders: {
+          ...options.defaultHeaders,
+          ...defaultHeaders,
+        },
+      });
     },
   },
   debug: {

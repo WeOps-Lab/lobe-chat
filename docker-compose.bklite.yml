@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: lobe-postgres-dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=lobechat
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password123
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # LobeChat 应用
+  lobe-chat:
+    image: lobehub/lobe-chat-database:latest
+    container_name: lobe-chat-dev
+    ports:
+      - '3210:3210'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # NextAuth 配置
+      - NEXT_PUBLIC_ENABLE_NEXT_AUTH=1
+      - NEXT_AUTH_SECRET=NX2kaPE923dt6BL2U8e9oSre5RfoT7hg
+      - NEXT_AUTH_SSO_PROVIDERS=bklite
+      - NEXTAUTH_URL=http://localhost:3210/api/auth
+      
+      # BkLite 配置
+      - AUTH_BKLITE_API_URL=http://10.10.40.117:8000/login
+      
+      # 数据库配置
+      - DATABASE_URL=postgresql://postgres:password123@postgres:5432/lobechat
+      - KEY_VAULTS_SECRET=Kix2wcUONd4CX51E/ZPAd36BqM4wzJgKjPtz2sGztqQ=
+      
+      # 服务模式
+      - NEXT_PUBLIC_SERVICE_MODE=server
+      
+      # 可选：OpenAI API Key（用于测试 AI 功能）
+      # - OPENAI_API_KEY=sk-your-openai-key-here
+    restart: unless-stopped
+    volumes:
+      # 如果需要持久化配置
+      - app_data:/app/data
+
+volumes:
+  postgres_data:
+    driver: local
+  app_data:
+    driver: local

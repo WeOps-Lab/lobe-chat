@@ -76,11 +76,35 @@ export const getProviderAuthPayload = (
   }
 };
 
+// Get the current user's session token (if any)
+const getBkliteSessionToken = async (): Promise<string | null> => {
+  try {
+    // Obtain the next-auth session in the client environment
+    if (typeof window !== 'undefined') {
+      const { getSession } = await import('next-auth/react');
+      const session = await getSession();
+      return session?.accessToken || null;
+    }
+    return null;
+  } catch (error) {
+    console.warn('Failed to get session token:', error);
+    return null;
+  }
+};
+
 const createAuthTokenWithPayload = async (payload = {}) => {
   const accessCode = keyVaultsConfigSelectors.password(useUserStore.getState());
   const userId = userProfileSelectors.userId(useUserStore.getState());
 
-  return createJWT<JWTPayload>({ accessCode, userId, ...payload });
+  // Attempt to obtain the bklite session token
+  const bkliteToken = await getBkliteSessionToken();
+  
+  // If there is a bklite token, add it to the payload
+  const enhancedPayload = bkliteToken 
+    ? { ...payload, bkliteToken } 
+    : payload;
+
+  return createJWT<JWTPayload>({ accessCode, userId, ...enhancedPayload });
 };
 
 interface AuthParams {

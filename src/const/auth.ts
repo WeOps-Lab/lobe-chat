@@ -45,5 +45,11 @@ export interface JWTPayload {
    * in server db mode it's a user id
    */
   userId?: string;
+
+  /**
+   * bklite session token
+   * Used for bklite authentication in API requests
+   */
+  bkliteToken?: string;
 }
 /* eslint-enable */

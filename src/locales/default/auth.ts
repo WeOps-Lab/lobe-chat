@@ -1,4 +1,25 @@
 export default {
+  bklite: {
+    description: '请输入您的用户名和密码',
+    form: {
+      cancel: '取消',
+      login: '登录',
+      loginError: '登录失败，请重试',
+      loginFailed: '登录失败，请检查用户名和密码',
+      loginSuccess: '登录成功',
+      password: {
+        label: '密码',
+        placeholder: '请输入密码',
+        required: '请输入密码',
+      },
+      username: {
+        label: '用户名',
+        placeholder: '请输入用户名',
+        required: '请输入用户名',
+      },
+    },
+    title: 'BkLite 登录',
+  },
   date: {
     prevMonth: '上个月',
     recent30Days: '最近30天',
